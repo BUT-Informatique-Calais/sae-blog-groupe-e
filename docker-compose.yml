@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # Apache web server
+  apache:
+    image: httpd:2.4
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
+    depends_on:
+      - php
+    networks:
+      - sae-blog-network
+
+  # PHP service
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - postgres
+      - mailpit
+    networks:
+      - sae-blog-network
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: sae_blog_db
+      POSTGRES_USER: sae_user
+      POSTGRES_PASSWORD: sae_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - sae-blog-network
+
+  # Mailpit for email testing
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025"  # SMTP port
+      - "8025:8025"  # Web UI port
+    networks:
+      - sae-blog-network
+
+  # Node.js for frontend development
+  node:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: tail -f /dev/null  # Keep the container running
+    networks:
+      - sae-blog-network
+
+networks:
+  sae-blog-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

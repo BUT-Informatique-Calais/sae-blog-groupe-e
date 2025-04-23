@@ -9,16 +9,12 @@ RUN apt-get update && apt-get install -y \
     git \
     curl
 
-# Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql zip
 
-# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Configure PHP
 COPY php.ini /usr/local/etc/php/conf.d/custom.ini
 
 CMD ["php-fpm"]

@@ -17,16 +17,4 @@ WORKDIR /var/www/html
 
 COPY php.ini /usr/local/etc/php/conf.d/custom.ini
 
-# Copier les fichiers composer
-COPY composer.json composer.lock ./
-
-# Installer les dépendances
-RUN composer install --no-scripts --no-autoloader
-
-# Copier le reste de l'application
-COPY . .
-
-# Finaliser l'installation de Composer
-RUN composer dump-autoload --optimize
-
 CMD ["php-fpm"]

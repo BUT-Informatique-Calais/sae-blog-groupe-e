@@ -17,4 +17,9 @@ WORKDIR /var/www/html
 
 COPY php.ini /usr/local/etc/php/conf.d/custom.ini
 
+# Créer le dossier pour les uploads et définir les permissions
+RUN mkdir -p /var/www/html/public/uploads \
+    && chown -R www-data:www-data /var/www/html/public/uploads \
+    && chmod -R 775 /var/www/html/public/uploads
+
 CMD ["php-fpm"]
